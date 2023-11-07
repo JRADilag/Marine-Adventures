@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -45,11 +43,19 @@ namespace Marine_Adventures
             exit.Anchor = AnchorStyles.None;
 
             exit.Click += new EventHandler(ExitButtonEvent);
+            start.Click += new EventHandler(StartGameButtonEvent);
 
             foreach (System.Windows.Forms.Button button in buttons)
             {
                 this.Controls.Add(button);
             }
+        }
+
+        private void StartGameButtonEvent(object sender, EventArgs e)
+        {
+            this.Hide();
+            GameWindow gameWindow = new GameWindow();
+            gameWindow.ShowDialog();
         }
 
         private void ExitButtonEvent(object sender, EventArgs e)
