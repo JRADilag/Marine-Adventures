@@ -22,7 +22,9 @@ namespace Marine_Adventures
             WINDOW_WIDTH = Screen.PrimaryScreen.Bounds.Width / 1.2;
             this.Text = "Marine Adventures";
             this.Size = new Size((int)WINDOW_WIDTH, (int)WINDOW_HEIGHT);
-
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             System.Windows.Forms.Button[] buttons = { start, load, highscore, exit };
 
             start.Text = "Start";

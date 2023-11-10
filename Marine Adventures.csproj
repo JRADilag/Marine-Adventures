@@ -45,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bullet.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Enemy.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GameWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -72,6 +78,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Enemy.png" />
+    <None Include="Resources\Bullet.png" />
     <Content Include="Resources\Image1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

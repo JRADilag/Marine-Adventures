@@ -14,6 +14,7 @@ namespace Marine_Adventures
         private int life = 3;
         private int speed = 30;
         private double shootDelay;
+        private int shootSpeed = 50;
         private int score = 0;
         private int sizeHeight = 50, sizeWidth = 50;
         private int playerX = 100, playerY = 100;
@@ -24,6 +25,18 @@ namespace Marine_Adventures
             this.SizeMode = PictureBoxSizeMode.StretchImage;
             this.Image = Resources.player;
             this.Location = new System.Drawing.Point(playerX, playerY);
+        }
+
+        public void Shoot()
+        {
+            Bullet playerBullet = new Bullet(this.Location);
+            playerBullet.BulletSpeed = shootSpeed;
+            this.Parent.Controls.Add(playerBullet);
+            //if (playerBullet.Bounds.IntersectsWith(this.Parent.Controls.Find("Enemy", false)[0].Bounds))
+            //{
+            //    return true;
+            //}
+            //return false;
         }
 
         public string PlayerName
