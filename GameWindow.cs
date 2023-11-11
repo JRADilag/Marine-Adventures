@@ -63,19 +63,19 @@ namespace Marine_Adventures
 
         private void GameWindowLoop(object sender, EventArgs e)
         {
-            if (movingLeft)
+            if (movingLeft && player.Left > 0)
             {
                 player.Left -= player.Speed;
             }
-            if (movingRight)
+            if (movingRight && player.Left < 500)
             {
                 player.Left += player.Speed;
             }
-            if (movingUp)
+            if (movingUp && player.Top > 0)
             {
                 player.Top -= player.Speed;
             }
-            if (movingDown)
+            if (movingDown && player.Top < WINDOW_HEIGHT - (player.Height * 2))
             {
                 player.Top += player.Speed;
             }
@@ -83,30 +83,30 @@ namespace Marine_Adventures
             {
                 player.Shoot();
             }
-
             foreach (Control control in this.Controls)
             {
-                foreach (Control control2 in this.Controls)
+                foreach (Enemy enemy in enemies)
                 {
-                    if ((control is PictureBox && control.Tag == "Bullet") && (control2 is PictureBox && control2.Tag == "Enemy"))
+                    if (control is PictureBox && control.Tag == "Bullet")
                     {
-                        if (control.Bounds.IntersectsWith(control2.Bounds))
+                        if (control.Bounds.IntersectsWith(enemy.Bounds))
                         {
-                            //Enemy Hit
+                            Collision(control, enemy);
+                            Console.WriteLine("Hit");
+                            enemy.Health -= 1;
 
-                            this.Controls.Remove(control);
-                            control.Dispose();
-
-                            PictureBox bulletHit = new PictureBox();
-                            bulletHit.Image = Resources.Hit;
-                            bulletHit.Location = control2.Location;
-                            bulletHit.Left -= 20;
-                            bulletHit.BackColor = Color.Transparent;
-                            bulletHit.SizeMode = PictureBoxSizeMode.StretchImage;
-                            bulletHit.Size = new Size(26, 24);
-                            this.Controls.Add(bulletHit);
+                            if (enemy.Health == 0)
+                            {
+                                this.Controls.Remove(enemy);
+                                enemy.Dispose();
+                            }
                         }
                     }
+                }
+                if (control is PictureBox && control.Tag == "Hit")
+                {
+                    this.Controls.Remove(control);
+                    control.Dispose();
                 }
             }
 
@@ -115,6 +115,22 @@ namespace Marine_Adventures
                 currentLevel += 1;
             }
             this.Invalidate();
+        }
+
+        private void Collision(Control control, Control control2)
+        {
+            this.Controls.Remove(control);
+            control.Dispose();
+
+            PictureBox bulletHit = new PictureBox();
+            bulletHit.Image = Resources.Hit;
+            bulletHit.Location = control2.Location;
+            bulletHit.Left -= 40;
+            bulletHit.BackColor = Color.Transparent;
+            bulletHit.SizeMode = PictureBoxSizeMode.StretchImage;
+            bulletHit.Size = new Size(26, 24);
+            bulletHit.Tag = "Hit";
+            this.Controls.Add(bulletHit);
         }
 
         private void GameWindowControlsDown(object sender, KeyEventArgs e)

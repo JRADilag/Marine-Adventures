@@ -10,7 +10,7 @@ namespace Marine_Adventures
 {
     internal class Enemy : PictureBox
     {
-        private int health;
+        private int health = 20;
         private int speed;
         private int sizeHeight = 32, sizeWidth = 30;
         private double shootDelay;
@@ -33,6 +33,12 @@ namespace Marine_Adventures
             this.Location = new System.Drawing.Point(startPosX, startPosY);
             this.Tag = "Enemy";
             Console.WriteLine("Enemy located in {0}, {1}", startPosX, startPosY);
+        }
+
+        public int Health
+        {
+            get { return health; }
+            set { health = value; }
         }
     }
 }
