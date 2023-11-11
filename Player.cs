@@ -18,6 +18,7 @@ namespace Marine_Adventures
         private int score = 0;
         private int sizeHeight = 50, sizeWidth = 50;
         private int playerX = 100, playerY = 100;
+        private bool isShooting = false;
 
         public Player()
         {
@@ -68,6 +69,12 @@ namespace Marine_Adventures
         {
             get { return speed; }
             set { speed = value; }
+        }
+
+        public bool IsShooting
+        {
+            get { return isShooting; }
+            set { isShooting = value; }
         }
     }
 }

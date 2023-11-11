@@ -14,6 +14,7 @@ namespace Marine_Adventures
         private Random random = new Random();
         private double WINDOW_HEIGHT = Screen.PrimaryScreen.Bounds.Height / 1.2;
         private double WINDOW_WIDTH = Screen.PrimaryScreen.Bounds.Width / 1.2;
+        private bool movingLeft, movingRight, movingDown, movingUp;
 
         public GameWindow()
         {
@@ -22,7 +23,8 @@ namespace Marine_Adventures
             this.MaximizeBox = false;
             this.MinimizeBox = false;
 
-            this.KeyDown += new KeyEventHandler(GameWindowEvents);
+            this.KeyDown += new KeyEventHandler(GameWindowControlsDown);
+            this.KeyUp += new KeyEventHandler(GameWindowControlsUp);
             InitializeEntities();
             GameTimer();
         }
@@ -41,36 +43,85 @@ namespace Marine_Adventures
         {
             Timer gameTimer = new Timer();
             gameTimer.Interval = 1000 / 60;
-            gameTimer.Tick += Update;
+            gameTimer.Tick += GameWindowLoop;
             gameTimer.Start();
         }
 
-        private void Update(object sender, EventArgs e)
+        private void GameWindowLoop(object sender, EventArgs e)
         {
-            this.Invalidate();
-        }
-
-        private void GameWindowEvents(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Right)//&&player.Left < (int)WINDOW_WIDTH * 0.4)
-            {
-                player.Left += player.Speed;
-            }
-            if (e.KeyCode == Keys.Left)
+            if (movingLeft)
             {
                 player.Left -= player.Speed;
             }
-            if (e.KeyCode == Keys.Down)
+            if (movingRight)
             {
-                player.Top += player.Speed;
+                player.Left += player.Speed;
             }
-            if (e.KeyCode == Keys.Up)
+            if (movingUp)
             {
                 player.Top -= player.Speed;
             }
-            if (e.KeyCode == Keys.Space)
+            if (movingDown)
+            {
+                player.Top += player.Speed;
+            }
+            if (player.IsShooting)
             {
                 player.Shoot();
+            }
+
+            this.Invalidate();
+        }
+
+        private void GameWindowControlsDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Right:
+                    movingRight = true;
+                    break;
+
+                case Keys.Left:
+                    movingLeft = true;
+                    break;
+
+                case Keys.Up:
+                    movingUp = true;
+                    break;
+
+                case Keys.Down:
+                    movingDown = true;
+                    break;
+
+                case Keys.Space:
+                    player.IsShooting = true;
+                    break;
+            }
+        }
+
+        private void GameWindowControlsUp(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Right:
+                    movingRight = false;
+                    break;
+
+                case Keys.Left:
+                    movingLeft = false;
+                    break;
+
+                case Keys.Up:
+                    movingUp = false;
+                    break;
+
+                case Keys.Down:
+                    movingDown = false;
+                    break;
+
+                case Keys.Space:
+                    player.IsShooting = false;
+                    break;
             }
         }
     }
