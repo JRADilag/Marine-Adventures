@@ -78,8 +78,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Player.png" />
     <None Include="Resources\Enemy.png" />
     <None Include="Resources\Bullet.png" />
+    <None Include="Resources\Enemy1.png" />
+    <None Include="Resources\background.png" />
+    <None Include="Resources\Hit.png" />
     <Content Include="Resources\Image1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

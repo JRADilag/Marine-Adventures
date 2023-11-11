@@ -21,8 +21,10 @@ namespace Marine_Adventures
             this.Size = new Size(sizeWidth, sizeHeight);
             this.Location = location;
             this.Image = Resources.Bullet;
+            this.BackColor = Color.Transparent;
             this.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.Name = "bullet";
+            this.Tag = "Bullet";
+            this.Top += 10;
 
             Timer BulletTimer = new Timer();
             BulletTimer.Interval = 1000 / 60;
