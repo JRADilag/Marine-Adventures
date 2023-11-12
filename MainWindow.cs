@@ -24,6 +24,8 @@ namespace Marine_Adventures
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.BackgroundImage = Resources.MARINE_ADVENTURES;
+            this.BackgroundImageLayout = ImageLayout.Stretch;
             System.Windows.Forms.Button[] buttons = { start, load, highscore, exit };
 
             start.Text = "Start";

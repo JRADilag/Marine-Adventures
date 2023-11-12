@@ -79,20 +79,18 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\MARINE ADVENTURES.png" />
+    <None Include="Resources\Window04.png" />
     <None Include="Resources\Player_Bullet.png" />
     <None Include="Resources\Shoot.wav" />
     <None Include="Resources\Player.png" />
-    <None Include="Resources\Enemy.png" />
     <None Include="Resources\Bullet.png" />
     <None Include="Resources\Enemy1.png" />
     <None Include="Resources\background.png" />
     <None Include="Resources\Hit.png" />
     <None Include="Resources\Heart_Empty.png" />
     <None Include="Resources\Heart_Full.png" />
-    <None Include="Resources\Hit.wav" />
-    <None Include="Resources\Hit_Sound.wav" />
     <None Include="Resources\BGM.wav" />
-    <Content Include="Resources\Image1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

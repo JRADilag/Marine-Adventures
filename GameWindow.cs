@@ -31,6 +31,7 @@ namespace Marine_Adventures
             this.MinimizeBox = false;
             this.DoubleBuffered = true;
             this.BackColor = Color.LightSeaGreen;
+            this.Text = "Marine Adventures";
             this.KeyDown += new KeyEventHandler(GameWindowControlsDown);
             this.KeyUp += new KeyEventHandler(GameWindowControlsUp);
 

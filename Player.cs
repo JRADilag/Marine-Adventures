@@ -12,10 +12,10 @@ namespace Marine_Adventures
         private int life = 10;
         private int speed = 10;
         private int shootDelay = 200;
-        private int shootSpeed = 50;
+        private int shootSpeed = 40;
         private int score = 0;
         private int sizeHeight = 39, sizeWidth = 86;
-        private int playerX = 100, playerY = 100;
+        private int playerX = 100, playerY = (int)(Screen.PrimaryScreen.Bounds.Height / 1.2 / 2);
         private bool isShooting = false;
         private int currentLevel = 1;
         private Timer playerShootInterval = new Timer();
