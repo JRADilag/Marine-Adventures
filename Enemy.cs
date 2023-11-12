@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Marine_Adventures
 {
     internal class Enemy : PictureBox
     {
-        private int health = 20;
-        private int speed;
+        private int health = 10;
+        private int speed = 5;
         private int sizeHeight = 32, sizeWidth = 30;
-        private double shootDelay;
+        private int decision;
+        private bool isShooting = true;
+        private int shootDelay = 1000;
+        private int shootSpeed = 20;
+        private Timer shootInterval = new Timer();
 
-        //private Random random = new Random();
-        //private int startPosX, startPosY;
-        private double WINDOW_HEIGHT = Screen.PrimaryScreen.Bounds.Height / 1.2;
-
-        private double WINDOW_WIDTH = Screen.PrimaryScreen.Bounds.Width / 1.2;
+        // enemy movement: Y level only, track player y level, shoot staight.
 
         public Enemy(int startPosX, int startPosY)
         {
@@ -33,12 +29,57 @@ namespace Marine_Adventures
             this.Location = new System.Drawing.Point(startPosX, startPosY);
             this.Tag = "Enemy";
             Console.WriteLine("Enemy located in {0}, {1}", startPosX, startPosY);
+            shootInterval.Interval = shootDelay / 60;
+            shootInterval.Tick += Shoot;
+            shootInterval.Start();
+        }
+
+        public void Shoot(object sender, EventArgs e)
+        {
+            if (isShooting)
+            {
+                shootInterval.Interval = shootDelay;
+                Point loc = this.Location;
+                Bullet bullet = new Bullet(loc, "Enemy");
+                bullet.Shooter = "Enemy";
+                bullet.Tag = "EnemyBullet";
+                bullet.BulletSpeed = shootSpeed;
+
+                if (this.Parent != null)
+                {
+                    this.Parent.Controls.Add(bullet);
+                }
+            }
         }
 
         public int Health
         {
             get { return health; }
             set { health = value; }
+        }
+
+        public int Speed
+        {
+            get { return speed; }
+            set { speed = value; }
+        }
+
+        public int ShootDelay
+        {
+            get { return shootDelay; }
+            set { shootDelay = value; }
+        }
+
+        public int ShootSpeed
+        {
+            get { return shootSpeed; }
+            set { shootSpeed = value; }
+        }
+
+        public int Decision
+        {
+            get { return decision; }
+            set { decision = value; }
         }
     }
 }

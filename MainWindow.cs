@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Media;
 using System.Windows.Forms;
 
 namespace Marine_Adventures
@@ -15,9 +12,11 @@ namespace Marine_Adventures
         private Button load = new Button();
         private Button highscore = new Button();
         private Button exit = new Button();
+        private SoundPlayer BGM = new SoundPlayer(Resources.BGM);
 
         public MainWindow()
         {
+            BGM.PlayLooping();
             WINDOW_HEIGHT = Screen.PrimaryScreen.Bounds.Height / 1.2;
             WINDOW_WIDTH = Screen.PrimaryScreen.Bounds.Width / 1.2;
             this.Text = "Marine Adventures";
