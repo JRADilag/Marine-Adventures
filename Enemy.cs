@@ -7,6 +7,7 @@ namespace Marine_Adventures
     internal class Enemy : Character
     {
         private int decision;
+        public Timer ShootInterval = new Timer();
         //private PictureBox enemy = new PictureBox();
 
         // enemy movement: Y level only, track player y level, shoot staight.

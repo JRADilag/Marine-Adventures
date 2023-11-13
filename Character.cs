@@ -16,7 +16,6 @@ namespace Marine_Adventures
         protected int shootDelay, shootSpeed;
         protected bool isShooting;
         protected int x, y;
-        protected Timer ShootInterval = new Timer();
 
         public abstract void Shoot(object sender, EventArgs e);
 

@@ -19,7 +19,7 @@ namespace Marine_Adventures
         private bool movingLeft, movingRight, movingDown, movingUp;
         private bool isLevelOver;
         private bool isGameOver = false;
-        private bool isLoad = false;
+        private bool isLoad;
         private int numberOfEnemies = 3;
         public List<PictureBox> enemies = new List<PictureBox>();
         public List<PictureBox> lifeGUI = new List<PictureBox>();
@@ -27,7 +27,7 @@ namespace Marine_Adventures
         public List<Obstacles> obstacles = new List<Obstacles>();
         public List<Label> textGUI;
 
-        public GameWindow()
+        public GameWindow(bool isLoad)
         {
             this.Size = new System.Drawing.Size((int)WINDOW_WIDTH, (int)WINDOW_HEIGHT);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -38,6 +38,7 @@ namespace Marine_Adventures
             this.Text = "Marine Adventures";
             this.KeyDown += new KeyEventHandler(GameWindowControlsDown);
             this.KeyUp += new KeyEventHandler(GameWindowControlsUp);
+            this.isLoad = isLoad;
 
             InitializeEntities(player.CurrentLevel);
             GameTimer();
@@ -51,7 +52,7 @@ namespace Marine_Adventures
             this.Controls.Add(player);
 
             // load
-            if (File.Exists("gameSave.txt"))
+            if (File.Exists("gameSave.txt") && this.isLoad == true)
             {
                 string playerData = File.ReadAllText("gameSave.txt");
                 Console.Write(playerData);
@@ -278,12 +279,25 @@ namespace Marine_Adventures
             }
             if (isGameOver)
             {
-                // save player name and score
+                // close form and open a new diaglogue to save player name and score
 
                 gameTimer.Stop();
                 subTimer.Stop();
                 environmentTimer.Stop();
-                MessageBox.Show("Game Over.");
+                player.ShootInterval.Stop();
+
+                foreach (Enemy enemy in enemies)
+                {
+                    enemy.ShootInterval.Stop();
+                }
+
+                this.ForeColor = Color.DarkSlateGray;
+                this.BackColor = Color.DarkSlateGray;
+
+                this.Close();
+
+                Form endDialogue = new Form();
+                endDialogue.ShowDialog();
             }
             this.Invalidate();
         }
@@ -517,6 +531,10 @@ namespace Marine_Adventures
 
                 case Keys.Space:
                     player.IsShooting = false;
+                    break;
+
+                case Keys.Escape:
+                    isGameOver = true;
                     break;
             }
         }

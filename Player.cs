@@ -16,6 +16,7 @@ namespace Marine_Adventures
         private int barrels = 1;
         private int damage;
         private Point bulletLoc;
+        public Timer ShootInterval = new Timer();
 
         public Player()
         {

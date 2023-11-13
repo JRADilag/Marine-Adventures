@@ -47,6 +47,7 @@ namespace Marine_Adventures
 
             exit.Click += new EventHandler(ExitButtonEvent);
             start.Click += new EventHandler(StartGameButtonEvent);
+            load.Click += new EventHandler(StartGameButtonEventLoad);
 
             foreach (System.Windows.Forms.Button button in buttons)
             {
@@ -57,8 +58,17 @@ namespace Marine_Adventures
         private void StartGameButtonEvent(object sender, EventArgs e)
         {
             this.Hide();
-            GameWindow gameWindow = new GameWindow();
+            GameWindow gameWindow = new GameWindow(false);
             gameWindow.ShowDialog();
+            this.Show();
+        }
+
+        private void StartGameButtonEventLoad(object sender, EventArgs e)
+        {
+            this.Hide();
+            GameWindow gameWindow = new GameWindow(true);
+            gameWindow.ShowDialog();
+            this.Show();
         }
 
         private void ExitButtonEvent(object sender, EventArgs e)
