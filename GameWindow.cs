@@ -19,6 +19,7 @@ namespace Marine_Adventures
         private bool movingLeft, movingRight, movingDown, movingUp;
         private bool isLevelOver;
         private bool isGameOver = false;
+        private bool isLoad = false;
         private int numberOfEnemies = 3;
         public List<PictureBox> enemies = new List<PictureBox>();
         public List<PictureBox> lifeGUI = new List<PictureBox>();
@@ -270,10 +271,9 @@ namespace Marine_Adventures
             if (isLevelOver)
             {
                 // save game state
+                player.CurrentLevel += 1;
                 SaveGame save = new SaveGame();
                 save.SaveGameState(player);
-                Console.WriteLine("Player Score: {0}", player.Score);
-                player.CurrentLevel += 1;
                 resetGame();
             }
             if (isGameOver)
