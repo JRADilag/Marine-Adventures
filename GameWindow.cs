@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Media;
 using System.Windows.Forms;
 
 namespace Marine_Adventures
@@ -13,14 +13,17 @@ namespace Marine_Adventures
         private Random random = new Random();
         private Timer gameTimer = new Timer();
         private Timer subTimer = new Timer();
+        private Timer environmentTimer = new Timer();
         private double WINDOW_HEIGHT = Screen.PrimaryScreen.Bounds.Height / 1.2;
         private double WINDOW_WIDTH = Screen.PrimaryScreen.Bounds.Width / 1.2;
         private bool movingLeft, movingRight, movingDown, movingUp;
         private bool isLevelOver;
         private bool isGameOver = false;
-        private int numberOfEnemies = 5;
+        private int numberOfEnemies = 3;
         public List<PictureBox> enemies = new List<PictureBox>();
         public List<PictureBox> lifeGUI = new List<PictureBox>();
+        public List<PowerUps> powerUps = new List<PowerUps>();
+        public List<Obstacles> obstacles = new List<Obstacles>();
         public List<Label> textGUI;
 
         public GameWindow()
@@ -38,6 +41,7 @@ namespace Marine_Adventures
             InitializeEntities(player.CurrentLevel);
             GameTimer();
             SubTimer();
+            EnvironmentTimer();
         }
 
         private void InitializeEntities(int level)
@@ -45,35 +49,65 @@ namespace Marine_Adventures
             //PLAYER
             this.Controls.Add(player);
 
-            //GUI
-            lifeGUI = player.HeartGUI();
-            textGUI = player.TextGUI();
-            foreach (PictureBox heart in lifeGUI)
+            // load
+            if (File.Exists("gameSave.txt"))
             {
-                this.Controls.Add(heart);
+                string playerData = File.ReadAllText("gameSave.txt");
+                Console.Write(playerData);
+                string[] playerDataLoaded = playerData.Split(';');
+                Console.Write(playerDataLoaded.ToString());
+                player.CurrentLevel = Int32.Parse(playerDataLoaded[0]);
+                player.Damage = Int32.Parse(playerDataLoaded[1]);
+                player.Health = Int32.Parse(playerDataLoaded[2]);
+                player.Score = Int32.Parse(playerDataLoaded[3]);
+                player.Barrels = Int32.Parse(playerDataLoaded[4]);
+                player.Speed = Int32.Parse(playerDataLoaded[5]);
             }
 
-            foreach (Label label in textGUI)
-            {
-                this.Controls.Add(label);
-            }
+            //GUI
+            resetGUI();
             //ENEMIES
-            int enemyX;
-            int enemyY;
+            SpawnEnemies();
+        }
+
+        private int enemyX;
+        private int enemyY;
+
+        private void SpawnEnemies()
+        {
             for (int i = 0; i < numberOfEnemies; i++)
             {
                 enemyX = random.Next((int)(WINDOW_WIDTH * 0.4), (int)WINDOW_WIDTH - 100);
                 enemyY = random.Next(0, (int)WINDOW_HEIGHT - 200);
-                enemies.Add(new Enemy(enemyX, enemyY));
+                enemies.Add(new Enemy(enemyX, enemyY, "Normal"));
             }
             foreach (Enemy enemy in enemies)
             {
                 enemy.Speed += 2 * player.CurrentLevel;
                 enemy.ShootDelay -= 2 * player.CurrentLevel;
                 enemy.ShootSpeed += 2 * player.CurrentLevel;
+                enemy.Health += (int)(player.CurrentLevel * 1.8);
                 this.Controls.Add(enemy);
             }
 ;
+        }
+
+        private void SpawnBoss()
+        {
+            enemyX = (int)WINDOW_WIDTH - 200;
+            enemyY = (int)WINDOW_HEIGHT / 2;
+            enemies.Add(new Enemy(enemyX, enemyY, "Boss"));
+            foreach (Enemy enemy in enemies)
+            {
+                enemy.Speed += 2 * player.CurrentLevel;
+                enemy.ShootDelay -= 2 * player.CurrentLevel;
+                enemy.ShootSpeed += 2 * player.CurrentLevel;
+                enemy.Health += (int)(player.CurrentLevel * 1.8);
+                this.Controls.Add(enemy);
+            }
+            Enemy a = (Enemy)enemies.Find(x => x.Name == "Boss");
+            Console.WriteLine("boss health {0}", a.Health);
+            Console.WriteLine("player damage {0}", player.Damage);
         }
 
         private void GameTimer()
@@ -88,6 +122,32 @@ namespace Marine_Adventures
             subTimer.Interval = 500;
             subTimer.Tick += SubTimer;
             subTimer.Start();
+        }
+
+        private void EnvironmentTimer()
+        {
+            environmentTimer.Interval = 5000;
+            environmentTimer.Tick += EnvironmentTimer_Tick;
+            environmentTimer.Start();
+        }
+
+        private void EnvironmentTimer_Tick(object sender, EventArgs e)
+        {
+            if (enemies.Count < 6 && player.CurrentLevel % 5 != 0)
+            {
+                SpawnEnemies();
+            }
+            else if (!(enemies.Exists(x => x.Name == "Boss")) && player.CurrentLevel % 5 == 0)
+            {
+                SpawnBoss();
+            }
+            PowerUps powerUp = new PowerUps();
+            this.powerUps.Add(powerUp);
+            this.Controls.Add(powerUp);
+
+            Obstacles obstacle = new Obstacles();
+            this.obstacles.Add(obstacle);
+            this.Controls.Add(obstacle);
         }
 
         private void GameWindowLoop(object sender, EventArgs e)
@@ -115,7 +175,7 @@ namespace Marine_Adventures
                     if (control.Bounds.IntersectsWith(player.Bounds))
                     {
                         Collision(control, player);
-                        player.Life -= 1;
+                        player.Health -= 1;
                         if (lifeGUI.Count > 1)
                         {
                             this.Controls.Remove(lifeGUI.Last());
@@ -129,6 +189,55 @@ namespace Marine_Adventures
                     }
                 }
 
+                for (int i = powerUps.Count - 1; i >= 0; i--)
+                {
+                    PowerUps powerUp = (PowerUps)powerUps[i];
+
+                    if (control is PictureBox && (string)control.Tag == "PowerUp")
+                    {
+                        if (control.Bounds.IntersectsWith(player.Bounds))
+                        {
+                            switch (powerUp.Name)
+                            {
+                                case "HealthPowerUp":
+                                    if (player.Health < 3)
+                                    {
+                                        player.Health += 1;
+                                        resetGUI();
+                                    }
+                                    Collision(control, powerUp);
+                                    this.Controls.Remove(powerUp);
+                                    powerUp.Dispose();
+                                    powerUps.Remove(powerUp); break;
+
+                                case "SpeedPowerUp":
+                                    if (player.Speed < 30)
+                                    {
+                                        player.Speed += 1;
+                                    }
+                                    Collision(control, powerUp);
+                                    this.Controls.Remove(powerUp);
+                                    powerUp.Dispose();
+                                    powerUps.Remove(powerUp); break;
+
+                                case "AttackPowerUp":
+                                    if (player.Barrels < 2)
+                                    {
+                                        player.Barrels += 1;
+                                    }
+                                    else
+                                    {
+                                        player.Damage += 1;
+                                    }
+                                    Collision(control, powerUp);
+                                    this.Controls.Remove(powerUp);
+                                    powerUp.Dispose();
+                                    powerUps.Remove(powerUp); break;
+                            }
+                        }
+                    }
+                }
+
                 for (int i = enemies.Count - 1; i >= 0; i--)
                 {
                     Enemy enemy = (Enemy)enemies[i];
@@ -137,10 +246,10 @@ namespace Marine_Adventures
                         if (control.Bounds.IntersectsWith(enemy.Bounds))
                         {
                             Collision(control, enemy);
-                            enemy.Health -= 1;
+                            enemy.Health -= player.Damage;
 
                             // enemy defeated
-                            if (enemy.Health == 0)
+                            if (enemy.Health <= 0)
                             {
                                 player.Score += 10;
                                 textGUI[0].Text = "Score: " + player.Score.ToString();
@@ -160,14 +269,20 @@ namespace Marine_Adventures
 
             if (isLevelOver)
             {
+                // save game state
+                SaveGame save = new SaveGame();
+                save.SaveGameState(player);
                 Console.WriteLine("Player Score: {0}", player.Score);
                 player.CurrentLevel += 1;
                 resetGame();
             }
             if (isGameOver)
             {
+                // save player name and score
+
                 gameTimer.Stop();
                 subTimer.Stop();
+                environmentTimer.Stop();
                 MessageBox.Show("Game Over.");
             }
             this.Invalidate();
@@ -229,7 +344,35 @@ namespace Marine_Adventures
                     {
                         if (control.Bounds.IntersectsWith(enemy.Bounds))
                         {
-                            player.Life -= 1;
+                            player.Health -= 1;
+                            if (lifeGUI.Count > 1)
+                            {
+                                this.Controls.Remove(lifeGUI.Last());
+                                lifeGUI.Last().Dispose();
+                                lifeGUI.Remove(lifeGUI.Last());
+                            }
+                            else
+                            {
+                                isGameOver = true;
+                            }
+                        }
+                    }
+                }
+
+                for (int i = obstacles.Count - 1; i >= 0; i--)
+                {
+                    Obstacles obstacle = (Obstacles)obstacles[i];
+
+                    if (control is PictureBox && (string)control.Tag == "Player")
+                    {
+                        if (control.Bounds.IntersectsWith(obstacle.Bounds))
+                        {
+                            player.Health -= 1;
+                            Collision(control, obstacle);
+                            this.Controls.Remove(obstacle);
+                            obstacle.Dispose();
+                            obstacles.Remove(obstacle);
+
                             if (lifeGUI.Count > 1)
                             {
                                 this.Controls.Remove(lifeGUI.Last());
@@ -248,7 +391,11 @@ namespace Marine_Adventures
 
         private void Collision(Control control, Control control2)
         {
-            if ((string)control.Tag == "Bullet" || (string)control.Tag == "EnemyBullet")
+            if ((string)control.Tag == "Bullet" ||
+                (string)control.Tag == "EnemyBullet" ||
+                (string)control.Name == "PowerUpHealth" ||
+                (string)control.Name == "PowerUpSpeed" ||
+                (string)control.Name == "PowerUpAttack")
             {
                 this.Controls.Remove(control);
                 control.Dispose();
@@ -279,18 +426,39 @@ namespace Marine_Adventures
                     control.Dispose();
                 }
             }
-            foreach (PictureBox heart in lifeGUI)
-            {
-                this.Controls.Remove(heart);
-                heart.Dispose();
-            }
-            foreach (Label label in textGUI)
-            {
-                this.Controls.Remove(label);
-                label.Dispose();
-            }
+            resetGUI();
+
             //intialize entities again
             InitializeEntities(player.CurrentLevel);
+        }
+
+        private void resetGUI()
+        {
+            if (lifeGUI != null && textGUI != null)
+            {
+                foreach (PictureBox heart in lifeGUI)
+                {
+                    this.Controls.Remove(heart);
+                    heart.Dispose();
+                }
+                foreach (Label label in textGUI)
+                {
+                    this.Controls.Remove(label);
+                    label.Dispose();
+                }
+            }
+
+            lifeGUI = player.HeartGUI();
+            textGUI = player.TextGUI();
+            foreach (PictureBox heart in lifeGUI)
+            {
+                this.Controls.Add(heart);
+            }
+
+            foreach (Label label in textGUI)
+            {
+                this.Controls.Add(label);
+            }
         }
 
         private void GameWindowControlsDown(object sender, KeyEventArgs e)

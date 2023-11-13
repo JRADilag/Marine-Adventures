@@ -4,41 +4,48 @@ using System.Windows.Forms;
 
 namespace Marine_Adventures
 {
-    internal class Enemy : PictureBox
+    internal class Enemy : Character
     {
-        private int health = 10;
-        private int speed = 5;
-        private int sizeHeight = 32, sizeWidth = 30;
         private int decision;
-        private bool isShooting = true;
-        private int shootDelay = 1000;
-        private int shootSpeed = 20;
-        private Timer shootInterval = new Timer();
+        //private PictureBox enemy = new PictureBox();
 
         // enemy movement: Y level only, track player y level, shoot staight.
 
-        public Enemy(int startPosX, int startPosY)
+        public Enemy(int startPosX, int startPosY, string type)
         {
-            //startPosX = random.Next((int)(WINDOW_WIDTH * 0.4), (int)WINDOW_WIDTH);
-            //startPosY = random.Next(100, (int)(WINDOW_HEIGHT));
+            switch (type)
+            {
+                case "Normal":
+                    this.health = 2; this.speed = 5;
+                    this.sizeHeight = 32; this.sizeWidth = 30;
+                    this.isShooting = true; this.ShootDelay = 1000; this.shootSpeed = 20;
+                    this.Image = Resources.Enemy1;
+                    this.Name = "Normal";
+                    break;
 
+                case "Boss":
+                    this.health = 400; this.speed = 5;
+                    this.sizeHeight = 144; this.sizeWidth = 192;
+                    this.isShooting = true; this.shootDelay = 700; this.shootSpeed = 10;
+                    this.Image = Resources.Boss;
+                    this.Name = "Boss";
+                    break;
+            }
             this.Size = new Size(sizeWidth, sizeHeight);
             this.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.Image = Resources.Enemy1;
             this.BackColor = Color.Transparent;
             this.Location = new System.Drawing.Point(startPosX, startPosY);
             this.Tag = "Enemy";
-            Console.WriteLine("Enemy located in {0}, {1}", startPosX, startPosY);
-            shootInterval.Interval = shootDelay / 60;
-            shootInterval.Tick += Shoot;
-            shootInterval.Start();
+            this.ShootInterval.Interval = shootDelay / 60;
+            this.ShootInterval.Tick += Shoot;
+            this.ShootInterval.Start();
         }
 
-        public void Shoot(object sender, EventArgs e)
+        public override void Shoot(object sender, EventArgs e)
         {
             if (isShooting)
             {
-                shootInterval.Interval = shootDelay;
+                this.ShootInterval.Interval = shootDelay;
                 Point loc = this.Location;
                 Bullet bullet = new Bullet(loc, "Enemy");
                 bullet.Shooter = "Enemy";
@@ -50,30 +57,6 @@ namespace Marine_Adventures
                     this.Parent.Controls.Add(bullet);
                 }
             }
-        }
-
-        public int Health
-        {
-            get { return health; }
-            set { health = value; }
-        }
-
-        public int Speed
-        {
-            get { return speed; }
-            set { speed = value; }
-        }
-
-        public int ShootDelay
-        {
-            get { return shootDelay; }
-            set { shootDelay = value; }
-        }
-
-        public int ShootSpeed
-        {
-            get { return shootSpeed; }
-            set { shootSpeed = value; }
         }
 
         public int Decision

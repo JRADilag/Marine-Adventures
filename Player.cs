@@ -6,51 +6,58 @@ using System.Windows.Forms;
 
 namespace Marine_Adventures
 {
-    internal class Player : PictureBox
+    internal class Player : Character
     {
         private string name;
-        private int life = 10;
-        private int speed = 10;
-        private int shootDelay = 200;
-        private int shootSpeed = 40;
         private int score = 0;
-        private int sizeHeight = 39, sizeWidth = 86;
         private int playerX = 100, playerY = (int)(Screen.PrimaryScreen.Bounds.Height / 1.2 / 2);
-        private bool isShooting = false;
         private int currentLevel = 1;
-        private Timer playerShootInterval = new Timer();
         private SoundPlayer shootingSound = new SoundPlayer(Resources.Shoot);
+        private int barrels = 1;
+        private int damage;
+        private Point bulletLoc;
 
         public Player()
         {
+            this.health = 3; this.speed = 10;
+            this.ShootDelay = 200; this.shootSpeed = 40;
+            this.sizeHeight = 39; this.sizeWidth = 86;
+            this.IsShooting = false;
+            this.damage = 1;
+
             this.Size = new Size(sizeWidth, sizeHeight);
             this.SizeMode = PictureBoxSizeMode.StretchImage;
             this.Image = Resources.Player;
             this.Location = new System.Drawing.Point(playerX, playerY);
             this.BackColor = Color.Transparent;
             this.Tag = "Player";
-            playerShootInterval.Interval = shootDelay;
-            playerShootInterval.Tick += Shoot;
-            playerShootInterval.Start();
+            this.ShootInterval.Interval = shootDelay;
+            this.ShootInterval.Tick += Shoot;
+            this.ShootInterval.Start();
         }
 
-        public void Shoot(object sender, EventArgs e)
+        public override void Shoot(object sender, EventArgs e)
         {
             if (isShooting)
             {
                 shootingSound.Play();
-                playerShootInterval.Interval = shootDelay;
-                Bullet playerBullet = new Bullet(this.Location, "Player");
-                playerBullet.Shooter = "Player";
-                playerBullet.BulletSpeed = shootSpeed;
-                this.Parent.Controls.Add(playerBullet);
+                this.ShootInterval.Interval = shootDelay;
+
+                for (int i = 0; i < barrels; i++)
+                {
+                    Bullet playerBullet = new Bullet(this.Location, "Player");
+                    playerBullet.Top -= 10 * i;
+                    playerBullet.Shooter = "Player";
+                    playerBullet.BulletSpeed = shootSpeed;
+                    this.Parent.Controls.Add(playerBullet);
+                }
             }
         }
 
         public List<PictureBox> HeartGUI()
         {
             List<PictureBox> lifeGUI = new List<PictureBox>();
-            for (int life = 0; life < this.life; life++)
+            for (int life = 0; life < this.health; life++)
             {
                 PictureBox heart = new PictureBox();
                 heart.Image = Resources.Heart_Full;
@@ -95,28 +102,10 @@ namespace Marine_Adventures
             set { name = value; }
         }
 
-        public int Life
-        {
-            get { return life; }
-            set { life = value; }
-        }
-
         public int Score
         {
             get { return score; }
             set { score = value; }
-        }
-
-        public int ShootDelay
-        {
-            get { return shootDelay; }
-            set { shootDelay = value; }
-        }
-
-        public int Speed
-        {
-            get { return speed; }
-            set { speed = value; }
         }
 
         public int CurrentLevel
@@ -129,6 +118,18 @@ namespace Marine_Adventures
         {
             get { return isShooting; }
             set { isShooting = value; }
+        }
+
+        public int Barrels
+        {
+            get { return barrels; }
+            set { barrels = value; }
+        }
+
+        public int Damage
+        {
+            get { return damage; }
+            set { damage = value; }
         }
     }
 }

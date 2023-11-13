@@ -37,6 +37,7 @@ namespace Marine_Adventures
             {
                 this.Image = Resources.Bullet;
             }
+
             BulletTimer.Interval = 1000 / 60;
             BulletTimer.Tick += BulletMove;
             BulletTimer.Start();
