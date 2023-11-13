@@ -52,6 +52,9 @@
     <Compile Include="Character.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EndScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Enemy.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -59,6 +62,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GameWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HighscoreScreen.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainWindow.cs">

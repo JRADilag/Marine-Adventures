@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Media;
 using System.Windows.Forms;
 
@@ -28,7 +29,7 @@ namespace Marine_Adventures
             this.BackgroundImageLayout = ImageLayout.Stretch;
             System.Windows.Forms.Button[] buttons = { start, load, highscore, exit };
 
-            start.Text = "Start";
+            start.Text = "New Game";
             load.Text = "Load";
             highscore.Text = "High score";
             exit.Text = "Exit";
@@ -48,10 +49,26 @@ namespace Marine_Adventures
             exit.Click += new EventHandler(ExitButtonEvent);
             start.Click += new EventHandler(StartGameButtonEvent);
             load.Click += new EventHandler(StartGameButtonEventLoad);
+            highscore.Click += new EventHandler(HighScoreButtonEvent);
 
             foreach (System.Windows.Forms.Button button in buttons)
             {
                 this.Controls.Add(button);
+            }
+        }
+
+        private void HighScoreButtonEvent(object sender, EventArgs e)
+        {
+            if (File.Exists("highScores.txt"))
+            {
+                this.Hide();
+                HighscoreScreen highScores = new HighscoreScreen();
+                highScores.ShowDialog();
+                this.Show();
+            }
+            else
+            {
+                MessageBox.Show("No Scores Yet!");
             }
         }
 

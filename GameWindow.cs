@@ -296,7 +296,7 @@ namespace Marine_Adventures
 
                 this.Close();
 
-                Form endDialogue = new Form();
+                EndScreen endDialogue = new EndScreen(player.Score);
                 endDialogue.ShowDialog();
             }
             this.Invalidate();

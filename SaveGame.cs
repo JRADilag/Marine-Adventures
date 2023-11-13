@@ -9,7 +9,7 @@ namespace Marine_Adventures
 {
     internal class SaveGame
     {
-        private string gameState;
+        private string toSave;
 
         public SaveGame()
         {
@@ -17,17 +17,21 @@ namespace Marine_Adventures
 
         public void SaveGameState(Player player)
         {
-            gameState = player.CurrentLevel + ";" + player.Damage + ";" + player.Health + ";" + player.Score + ";" + player.Barrels + ";" + player.Speed;
-            Console.Write(gameState);
-
+            toSave = player.CurrentLevel + ";" + player.Damage + ";" + player.Health + ";" + player.Score + ";" + player.Barrels + ";" + player.Speed;
             //player level, player damage, player health, player score, player barrels, player speed
             //FileStream saveGameState = new FileStream("gameSave.txt", FileMode.OpenOrCreate);
-            File.WriteAllText("gameSave.txt", gameState);
+            File.WriteAllText("gameSave.txt", toSave);
         }
 
-        public void SaveHighScore()
+        public void SaveHighScore(string playerName, string playerScore)
         {
             //player level, player score
+            toSave = playerName + ";" + playerScore;
+            using (FileStream highscore = new FileStream("highScores.txt", FileMode.Append))
+            using (StreamWriter writeData = new StreamWriter(highscore))
+            {
+                writeData.WriteLine(toSave);
+            }
         }
     }
 }
