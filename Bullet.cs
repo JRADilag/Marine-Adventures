@@ -1,78 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
+using Marine_Adventures;
 using System.Drawing;
-using System.Linq;
-using System.Runtime.Remoting.Channels;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System;
 
-namespace Marine_Adventures
+public class Bullet : PictureBox
 {
-    internal class Bullet : PictureBox
+    private int sizeWidth = 24;
+    private int sizeHeight = 8;
+    private int bulletSpeed;
+    private string shooter;
+    private double WINDOW_WIDTH = Screen.PrimaryScreen.Bounds.Width / 1.2;
+    private Timer bulletTimer;
+
+    public Bullet(Point location, string shooter)
     {
-        private int sizeWidth = 24;
-        private int sizeHeight = 8;
-        private int bulletSpeed = 10;
-        private string shooter;
-        private double WINDOW_WIDTH = Screen.PrimaryScreen.Bounds.Width / 1.2;
+        this.Size = new Size(sizeWidth, sizeHeight);
+        this.Location = location;
+        this.BackColor = Color.Transparent;
+        this.SizeMode = PictureBoxSizeMode.StretchImage;
+        this.Tag = "Bullet";
+        this.Top += 10;
+        this.shooter = shooter;
 
-        private Timer BulletTimer = new Timer();
+        bulletTimer = new Timer();
+        bulletTimer.Tick += BulletMove;
 
-        public Bullet(Point location, string shooter)
+        //player and enemy shooting interval separated for easier adjustment
+        if (shooter == "Player")
         {
-            //starting location
-            this.Size = new Size(sizeWidth, sizeHeight);
-            this.Location = location;
-            this.BackColor = Color.Transparent;
-            this.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.Tag = "Bullet";
-            this.Top += 10;
-
-            if (shooter == "Player")
-            {
-                this.Image = Resources.Player_Bullet;
-            }
-            else if (shooter == "Enemy")
-            {
-                this.Image = Resources.Bullet;
-            }
-
-            BulletTimer.Interval = 1000 / 60;
-            BulletTimer.Tick += BulletMove;
-            BulletTimer.Start();
+            bulletSpeed = 10; 
+            bulletTimer.Interval = 900 / 60; 
+            this.Image = Resources.Player_Bullet;
+        }
+        else if (shooter == "Enemy")
+        {
+            bulletSpeed = 5;
+            bulletTimer.Interval = 2000 / 60; 
+            this.Image = Resources.Bullet;
         }
 
-        public string Shooter
+        bulletTimer.Start();
+    }
+
+    public string Shooter
+    {
+        get { return shooter; }
+        set { shooter = value; }
+    }
+
+    public int BulletSpeed
+    {
+        get { return bulletSpeed; }
+        set { bulletSpeed = value; }
+    }
+
+    private void BulletMove(object sender, EventArgs e)
+    {
+        switch (shooter)
         {
-            get { return shooter; }
-            set { shooter = value; }
+            case "Player":
+                this.Left += bulletSpeed;
+                break;
+
+            case "Enemy":
+                this.Left -= bulletSpeed;
+                break;
         }
 
-        public int BulletSpeed
+        if (this.Left > (int)WINDOW_WIDTH || this.Left < -20)
         {
-            get { return bulletSpeed; }
-            set { bulletSpeed = value; }
-        }
-
-        public void BulletMove(object sender, EventArgs e)
-        {
-            switch (shooter)
-            {
-                case "Player":
-                    this.Left += bulletSpeed;
-                    break;
-
-                case "Enemy":
-                    this.Left -= bulletSpeed;
-                    break;
-            }
-            if (this.Left > (int)WINDOW_WIDTH || this.Left < -20)
-            {
-                BulletTimer.Stop();
-                BulletTimer.Dispose();
-                BulletTimer = null;
-            }
+            bulletTimer.Stop();
+            bulletTimer.Dispose();
+            bulletTimer = null;
         }
     }
 }
