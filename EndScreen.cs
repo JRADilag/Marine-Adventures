@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -10,9 +10,8 @@ namespace Marine_Adventures
 {
     internal class EndScreen : Form
     {
-        private List<Control> screenControls = new List<Control>();
-        private SaveGame highScore = new SaveGame();
-        private int playerScore;
+        private readonly SaveGame highScore = new SaveGame();
+        private readonly int playerScore;
 
         public EndScreen(int playerScore)
         {
@@ -23,48 +22,42 @@ namespace Marine_Adventures
             this.Text = "Game Over!";
             this.playerScore = playerScore;
 
-            Label score = new Label();
-            Label gameOver = new Label();
-            TextBox nameEntry = new TextBox();
-            Button accept = new Button();
+            InitializeControls();
+        }
 
+        private void InitializeControls()
+        {
+            Label score = new Label();
+            score.Font = new Font(Font.Name, 14);
+            score.BackColor = Color.Transparent;
+            score.Text = "Score: " + playerScore.ToString();
+            score.AutoSize = true;
             score.Left = (this.ClientSize.Width - score.Width) / 2;
             score.Top = (this.ClientSize.Height - score.Height) / 2;
             score.Anchor = AnchorStyles.None;
-            score.Text = "Score: " + playerScore.ToString();
-            score.Font = new Font(score.Font.Name, 14);
-            score.BackColor = Color.Transparent;
 
+            TextBox nameEntry = new TextBox();
             nameEntry.Location = new Point(score.Left, score.Height + score.Top + 10);
             nameEntry.Anchor = AnchorStyles.None;
-            nameEntry.Text = "Enter your name";
+            nameEntry.Text = "";
 
+            Button accept = new Button();
             accept.Location = new Point(nameEntry.Left, nameEntry.Height + nameEntry.Top + 10);
             accept.Anchor = AnchorStyles.None;
             accept.Text = "Done";
             accept.BackColor = Color.Gray;
+            accept.Click += SaveHighScore;
 
-            accept.Click += new EventHandler(SaveHighScore);
-
-            screenControls.Add(accept);
-            screenControls.Add(score);
-            screenControls.Add(nameEntry);
-
-            foreach (Control control in screenControls)
-            {
-                this.Controls.Add(control);
-            }
+            Controls.AddRange(new Control[] { accept, score, nameEntry });
         }
 
         private void SaveHighScore(object sender, EventArgs e)
         {
-            string playerScore = this.playerScore.ToString();
-            string playerName = screenControls[2].Text;
+            string playerName = Controls[2].Text;
+            highScore.SaveHighScore(playerName, playerScore.ToString());
 
-            highScore.SaveHighScore(playerName, playerScore);
             MessageBox.Show("Highscore saved. Thank you for playing!");
-            this.Close();
-            // save highscore
+            Close();
         }
     }
 }
