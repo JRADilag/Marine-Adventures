@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -8,62 +8,83 @@ namespace Marine_Adventures
     {
         private int decision;
         public Timer ShootInterval = new Timer();
-        //private PictureBox enemy = new PictureBox();
-
-        // enemy movement: Y level only, track player y level, shoot staight.
 
         public Enemy(int startPosX, int startPosY, string type)
+        {
+            InitializeEnemy(type, startPosX, startPosY);
+            SetupShootInterval();
+        }
+
+        private void InitializeEnemy(string type, int startPosX, int startPosY)
         {
             switch (type)
             {
                 case "Normal":
-                    this.health = 2; this.speed = 5;
-                    this.sizeHeight = 32; this.sizeWidth = 30;
-                    this.isShooting = true; this.ShootDelay = 1000; this.shootSpeed = 20;
-                    this.Image = Resources.Enemy1;
-                    this.Name = "Normal";
+                    InitializeNormalEnemy();
                     break;
 
                 case "Boss":
-                    this.health = 400; this.speed = 5;
-                    this.sizeHeight = 144; this.sizeWidth = 192;
-                    this.isShooting = true; this.shootDelay = 700; this.shootSpeed = 10;
-                    this.Image = Resources.Boss;
-                    this.Name = "Boss";
+                    InitializeBossEnemy();
                     break;
             }
-            this.Size = new Size(sizeWidth, sizeHeight);
-            this.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.BackColor = Color.Transparent;
-            this.Location = new System.Drawing.Point(startPosX, startPosY);
-            this.Tag = "Enemy";
-            this.ShootInterval.Interval = shootDelay / 60;
-            this.ShootInterval.Tick += Shoot;
-            this.ShootInterval.Start();
+
+            SetupCommonProperties(startPosX, startPosY);
+        }
+
+        private void InitializeNormalEnemy()
+        {
+            health = 2; speed = 5;
+            sizeHeight = 32; sizeWidth = 30;
+            isShooting = true; ShootDelay = 1000; shootSpeed = 20;
+            Image = Resources.Enemy1;
+            Name = "Normal";
+        }
+
+        private void InitializeBossEnemy()
+        {
+            health = 400; speed = 5;
+            sizeHeight = 144; sizeWidth = 192;
+            isShooting = true; shootDelay = 700; shootSpeed = 10;
+            Image = Resources.Boss;
+            Name = "Boss";
+        }
+
+        private void SetupCommonProperties(int startPosX, int startPosY)
+        {
+            Size = new Size(sizeWidth, sizeHeight);
+            SizeMode = PictureBoxSizeMode.StretchImage;
+            BackColor = Color.Transparent;
+            Location = new Point(startPosX, startPosY);
+            Tag = "Enemy";
+        }
+
+        private void SetupShootInterval()
+        {
+            ShootInterval.Interval = shootDelay / 60;
+            ShootInterval.Tick += Shoot;
+            ShootInterval.Start();
         }
 
         public override void Shoot(object sender, EventArgs e)
         {
-            if (isShooting)
-            {
-                this.ShootInterval.Interval = shootDelay;
-                Point loc = this.Location;
-                Bullet bullet = new Bullet(loc, "Enemy");
-                bullet.Shooter = "Enemy";
-                bullet.Tag = "EnemyBullet";
-                bullet.BulletSpeed = shootSpeed;
+            if (!isShooting || Parent == null) return;
 
-                if (this.Parent != null)
-                {
-                    this.Parent.Controls.Add(bullet);
-                }
-            }
+            ShootInterval.Interval = shootDelay;
+            Point loc = Location;
+            Bullet bullet = new Bullet(loc, "Enemy")
+            {
+                Shooter = "Enemy",
+                Tag = "EnemyBullet",
+                BulletSpeed = shootSpeed
+            };
+
+            Parent.Controls.Add(bullet);
         }
 
         public int Decision
         {
-            get { return decision; }
-            set { decision = value; }
+            get => decision;
+            set => decision = value;
         }
     }
 }
