@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Text;
@@ -7,69 +7,76 @@ using System.Runtime.Remoting.Channels;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
 namespace Marine_Adventures
 {
     internal class PowerUps : Environment
     {
-        private Random random = new Random();
-        private string[] types = new string[3];
+        private static readonly Random random = new Random();
+        private readonly string[] types = { "Health", "Speed", "Attack" };
         private string type;
 
         public PowerUps()
         {
-            this.x = random.Next((int)(WINDOW_WIDTH * 0.4), (int)WINDOW_WIDTH - 100);
-            this.y = random.Next(0, (int)WINDOW_HEIGHT - 200);
-            this.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.Location = new System.Drawing.Point(x, y);
-            this.BackColor = Color.Transparent;
-            this.sizeHeight = 33 * 0.8;
-            this.sizeWidth = 33 * 0.8;
-            this.Size = new Size((int)sizeWidth, (int)sizeHeight);
-            this.Tag = "PowerUp";
+            InitializePowerUp();
+        }
 
-            this.MoveSpeed = 15;
+        private void InitializePowerUp()
+        {
+            x = random.Next((int)(WINDOW_WIDTH * 0.4), (int)WINDOW_WIDTH - 100);
+            y = random.Next(0, (int)WINDOW_HEIGHT - 200);
+            InitializeAppearance();
 
-            types[0] = "Health";
-            types[1] = "Speed";
-            types[2] = "Attack";
-
-            this.type = types[random.Next(3)];
-
-            switch (type)
-            {
-                case "Health":
-                    this.Name = "HealthPowerUp";
-                    this.Image = Resources.PowerUp_Health;
-                    break;
-
-                case "Speed":
-                    this.Name = "SpeedPowerUp";
-                    this.Image = Resources.PowerUp_Speed;
-                    break;
-
-                case "Attack":
-                    this.Name = "AttackPowerUp";
-                    this.Image = Resources.PowerUp_Attack;
-                    break;
-            }
+            type = types[random.Next(types.Length)];
+            SetPowerUpImage();
 
             timer.Interval = 200;
             timer.Tick += EventTimer;
             timer.Start();
         }
 
-        public string PowerUpType
+        private void InitializeAppearance()
         {
-            get { return type; }
+            SizeMode = PictureBoxSizeMode.StretchImage;
+            Location = new Point(x, y);
+            BackColor = Color.Transparent;
+            sizeHeight = 33 * 0.8;
+            sizeWidth = 33 * 0.8;
+            Size = new Size((int)sizeWidth, (int)sizeHeight);
+            Tag = "PowerUp";
+            MoveSpeed = 15;
         }
+
+        private void SetPowerUpImage()
+        {
+            switch (type)
+            {
+                case "Health":
+                    Name = "HealthPowerUp";
+                    Image = Resources.PowerUp_Health;
+                    break;
+
+                case "Speed":
+                    Name = "SpeedPowerUp";
+                    Image = Resources.PowerUp_Speed;
+                    break;
+
+                case "Attack":
+                    Name = "AttackPowerUp";
+                    Image = Resources.PowerUp_Attack;
+                    break;
+            }
+        }
+
+        public string PowerUpType => type;
 
         public override void EventTimer(object sender, EventArgs e)
         {
-            this.Left -= this.MoveSpeed;
+            Left -= MoveSpeed;
 
-            if (this.Left < -20)
+            if (Left < -20)
             {
                 timer.Stop();
                 timer.Dispose();
