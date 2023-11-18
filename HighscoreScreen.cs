@@ -11,55 +11,51 @@ namespace Marine_Adventures
 {
     internal class HighscoreScreen : Form
     {
-        private ListBox highScores = new ListBox();
-        private string[] scores;
+        private readonly ListBox highScores = new ListBox();
 
         public HighscoreScreen()
         {
-            string playerName, playerScore;
-            string[] playerData = new string[2];
-            string highScore;
+            InitializeForm();
+            LoadHighScores();
+        }
 
-            this.Size = new Size(500, 400);
+        private void InitializeForm()
+        {
+            this.Size = new System.Drawing.Size(500, 400);
             this.Text = "High Scores";
-
-            Button backButton = new Button();
-            backButton.Text = "Back";
-            backButton.Size = new Size(80, 30);
-            backButton.Location = new Point(10, 10);
-            backButton.Click += BackButton_Click;
-            this.Controls.Add(backButton);
-
-            highScores.Location = new Point(10, 50);
-            UpdateListBoxSize(); 
-
-            this.Controls.Add(highScores);
-
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
 
-            scores = File.ReadAllLines("highScores.txt");
+            Button backButton = new Button
+            {
+                Text = "Back",
+                Size = new System.Drawing.Size(80, 30),
+                Location = new System.Drawing.Point(10, 10)
+            };
+            backButton.Click += (sender, e) => this.Close();
 
-            highScores.BeginUpdate();
+            highScores.Location = new System.Drawing.Point(10, 50);
+            highScores.Size = new System.Drawing.Size(this.ClientSize.Width - 20, this.ClientSize.Height - 70);
+
+            this.Controls.Add(backButton);
+            this.Controls.Add(highScores);
+
+            this.Resize += (sender, e) => UpdateListBoxSize();
+        }
+
+        private void LoadHighScores()
+        {
+            string[] scores = File.ReadAllLines("highScores.txt")
+                                  .OrderByDescending(score => int.Parse(score.Split(';')[1]))
+                                  .ToArray();
 
             foreach (string score in scores)
             {
-                playerData = score.Split(';');
-
-                highScore = "Name: " + playerData[0] + "\tScore: " + playerData[1];
-
+                string[] playerData = score.Split(';');
+                string highScore = $"Name: {playerData[0]}\tScore: {playerData[1]}";
                 highScores.Items.Add(highScore);
             }
-
-            highScores.EndUpdate();
-
-            this.Resize += HighscoreScreen_Resize;
-        }
-
-        private void HighscoreScreen_Resize(object sender, EventArgs e)
-        {
-            UpdateListBoxSize();
         }
 
         private void UpdateListBoxSize()
