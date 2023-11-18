@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Media;
@@ -9,64 +9,68 @@ namespace Marine_Adventures
     internal class Player : Character
     {
         private string name;
-        private int score = 0;
-        private int playerX = 100, playerY = (int)(Screen.PrimaryScreen.Bounds.Height / 1.2 / 2);
-        private int currentLevel = 1;
+        private int score = 0, currentLevel = 1, barrels = 1, damage;
         private SoundPlayer shootingSound = new SoundPlayer(Resources.Shoot);
-        private int barrels = 1;
-        private int damage;
-        private Point bulletLoc;
         public Timer ShootInterval = new Timer();
 
         public Player()
         {
-            this.health = 3; this.speed = 10;
-            this.ShootDelay = 200; this.shootSpeed = 40;
-            this.sizeHeight = 39; this.sizeWidth = 86;
-            this.IsShooting = false;
-            this.damage = 1;
+            InitializePlayer();
+        }
 
-            this.Size = new Size(sizeWidth, sizeHeight);
-            this.SizeMode = PictureBoxSizeMode.StretchImage;
-            this.Image = Resources.Player;
-            this.Location = new System.Drawing.Point(playerX, playerY);
-            this.BackColor = Color.Transparent;
-            this.Tag = "Player";
-            this.ShootInterval.Interval = shootDelay;
-            this.ShootInterval.Tick += Shoot;
-            this.ShootInterval.Start();
+        private void InitializePlayer()
+        {
+            health = 3; speed = 10; ShootDelay = 200; shootSpeed = 40;
+            sizeHeight = 39; sizeWidth = 86; IsShooting = false; damage = 1;
+
+            Size = new Size(sizeWidth, sizeHeight);
+            SizeMode = PictureBoxSizeMode.StretchImage;
+            Image = Resources.Player;
+            Location = new Point(100, (int)(Screen.PrimaryScreen.Bounds.Height / 1.2 / 2));
+            BackColor = Color.Transparent;
+            Tag = "Player";
+
+            ShootInterval.Interval = shootDelay;
+            ShootInterval.Tick += Shoot;
+            ShootInterval.Start();
         }
 
         public override void Shoot(object sender, EventArgs e)
         {
-            if (isShooting)
+            if (IsShooting)
             {
                 shootingSound.Play();
-                this.ShootInterval.Interval = shootDelay;
+                ShootInterval.Interval = shootDelay;
 
                 for (int i = 0; i < barrels; i++)
                 {
-                    Bullet playerBullet = new Bullet(this.Location, "Player");
-                    playerBullet.Top -= 10 * i;
-                    playerBullet.Shooter = "Player";
-                    playerBullet.BulletSpeed = shootSpeed;
-                    this.Parent.Controls.Add(playerBullet);
+                    int topPosition = Location.Y - 10 * i;
+
+                    var playerBullet = new Bullet(Location, "Player")
+                    {
+                        Shooter = "Player",
+                        BulletSpeed = shootSpeed,
+                        Top = topPosition
+                    };
+                    Parent.Controls.Add(playerBullet);
                 }
             }
         }
 
         public List<PictureBox> HeartGUI()
         {
-            List<PictureBox> lifeGUI = new List<PictureBox>();
-            for (int life = 0; life < this.health; life++)
+            var lifeGUI = new List<PictureBox>();
+            for (int life = 0; life < health; life++)
             {
-                PictureBox heart = new PictureBox();
-                heart.Image = Resources.Heart_Full;
-                heart.Location = new Point(30 + (20 * life), 30);
-                heart.BackColor = Color.Transparent;
-                heart.SizeMode = PictureBoxSizeMode.StretchImage;
-                heart.Size = new Size(12, 12);
-                heart.Tag = "Heart";
+                var heart = new PictureBox
+                {
+                    Image = Resources.Heart_Full,
+                    Location = new Point(30 + (20 * life), 30),
+                    BackColor = Color.Transparent,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Size = new Size(12, 12),
+                    Tag = "Heart"
+                };
                 lifeGUI.Add(heart);
             }
             return lifeGUI;
@@ -74,63 +78,57 @@ namespace Marine_Adventures
 
         public List<Label> TextGUI()
         {
-            List<Label> textGUI = new List<Label>();
-            Label scoreGUI = new Label();
-            scoreGUI.Location = new Point(30, 60);
-            scoreGUI.AutoSize = true;
-            scoreGUI.Name = "Score";
-            scoreGUI.ForeColor = Color.Transparent;
-            scoreGUI.Text = "Score: " + score.ToString();
-            scoreGUI.Font = new Font(scoreGUI.Font.Name, 14);
-            textGUI.Add(scoreGUI);
+            var textGUI = new List<Label>();
 
-            Label levelGUI = new Label();
-            levelGUI.Location = new Point(30, 90);
-            levelGUI.AutoSize = true;
-            levelGUI.Name = "Level";
-            levelGUI.ForeColor = Color.Transparent;
-            levelGUI.Text = "Level: " + currentLevel.ToString();
-            levelGUI.Font = new Font(levelGUI.Font.Name, 14);
-            textGUI.Add(levelGUI);
+            void AddLabel(string labelText, Point location)
+            {
+                var label = new Label
+                {
+                    Location = location,
+                    AutoSize = true,
+                    ForeColor = Color.Transparent,
+                    Text = labelText,
+                    Font = new Font(Font.Name, 14)
+                };
+                textGUI.Add(label);
+            }
+
+            AddLabel("Score: " + score, new Point(30, 60));
+            AddLabel("Level: " + currentLevel, new Point(30, 90));
 
             return textGUI;
         }
 
         public string PlayerName
-
         {
-            get { return name; }
-            set { name = value; }
+            get => name;
+            set => name = value;
         }
 
         public int Score
         {
-            get { return score; }
-            set { score = value; }
+            get => score;
+            set => score = value;
         }
 
         public int CurrentLevel
         {
-            get { return currentLevel; }
-            set { currentLevel = value; }
+            get => currentLevel;
+            set => currentLevel = value;
         }
 
-        public bool IsShooting
-        {
-            get { return isShooting; }
-            set { isShooting = value; }
-        }
+        public bool IsShooting { get; set; }
 
         public int Barrels
         {
-            get { return barrels; }
-            set { barrels = value; }
+            get => barrels;
+            set => barrels = value;
         }
 
         public int Damage
         {
-            get { return damage; }
-            set { damage = value; }
+            get => damage;
+            set => damage = value;
         }
     }
 }
