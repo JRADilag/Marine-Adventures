@@ -53,11 +53,18 @@ namespace Marine_Adventures
 
         private void SaveHighScore(object sender, EventArgs e)
         {
-            string playerName = Controls[2].Text;
-            highScore.SaveHighScore(playerName, playerScore.ToString());
+            if (!string.IsNullOrEmpty(Controls[2].Text))
+            {
+                string playerName = Controls[2].Text;
+                highScore.SaveHighScore(playerName, playerScore.ToString());
 
-            MessageBox.Show("Highscore saved. Thank you for playing!");
-            Close();
+                MessageBox.Show("Highscore saved. Thank you for playing!");
+                Close();
+            }
+            else
+            {
+                MessageBox.Show("Please enter your name.", "Name cannot be empty!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
     }
 }
