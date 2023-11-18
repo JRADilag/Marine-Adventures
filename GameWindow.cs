@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -48,27 +48,25 @@ namespace Marine_Adventures
 
         private void InitializeEntities(int level)
         {
-            //PLAYER
             this.Controls.Add(player);
 
-            // load
-            if (File.Exists("gameSave.txt") && this.isLoad == true)
+            if (isLoad && File.Exists("gameSave.txt"))
             {
                 string playerData = File.ReadAllText("gameSave.txt");
-                Console.Write(playerData);
                 string[] playerDataLoaded = playerData.Split(';');
-                Console.Write(playerDataLoaded.ToString());
-                player.CurrentLevel = Int32.Parse(playerDataLoaded[0]);
-                player.Damage = Int32.Parse(playerDataLoaded[1]);
-                player.Health = Int32.Parse(playerDataLoaded[2]);
-                player.Score = Int32.Parse(playerDataLoaded[3]);
-                player.Barrels = Int32.Parse(playerDataLoaded[4]);
-                player.Speed = Int32.Parse(playerDataLoaded[5]);
+
+                if (playerDataLoaded.Length >= 6)
+                {
+                    player.CurrentLevel = Int32.Parse(playerDataLoaded[0]);
+                    player.Damage = Int32.Parse(playerDataLoaded[1]);
+                    player.Health = Int32.Parse(playerDataLoaded[2]);
+                    player.Score = Int32.Parse(playerDataLoaded[3]);
+                    player.Barrels = Int32.Parse(playerDataLoaded[4]);
+                    player.Speed = Int32.Parse(playerDataLoaded[5]);
+                }
             }
 
-            //GUI
-            resetGUI();
-            //ENEMIES
+            ResetGUI();
             SpawnEnemies();
         }
 
@@ -139,17 +137,27 @@ namespace Marine_Adventures
             {
                 SpawnEnemies();
             }
-            else if (!(enemies.Exists(x => x.Name == "Boss")) && player.CurrentLevel % 5 == 0)
+            else if (!enemies.Any(x => x.Name == "Boss") && player.CurrentLevel % 5 == 0)
             {
                 SpawnBoss();
             }
-            PowerUps powerUp = new PowerUps();
-            this.powerUps.Add(powerUp);
-            this.Controls.Add(powerUp);
 
+            AddAndDisplayPowerUp();
+            AddAndDisplayObstacle();
+        }
+
+        private void AddAndDisplayPowerUp()
+        {
+            PowerUps powerUp = new PowerUps();
+            powerUps.Add(powerUp);
+            Controls.Add(powerUp);
+        }
+
+        private void AddAndDisplayObstacle()
+        {
             Obstacles obstacle = new Obstacles();
-            this.obstacles.Add(obstacle);
-            this.Controls.Add(obstacle);
+            obstacles.Add(obstacle);
+            Controls.Add(obstacle);
         }
 
         private void GameWindowLoop(object sender, EventArgs e)
@@ -205,7 +213,7 @@ namespace Marine_Adventures
                                     if (player.Health < 3)
                                     {
                                         player.Health += 1;
-                                        resetGUI();
+                                        ResetGUI();
                                     }
                                     Collision(control, powerUp);
                                     this.Controls.Remove(powerUp);
@@ -440,13 +448,13 @@ namespace Marine_Adventures
                     control.Dispose();
                 }
             }
-            resetGUI();
+            ResetGUI();
 
             //intialize entities again
             InitializeEntities(player.CurrentLevel);
         }
 
-        private void resetGUI()
+        private void ResetGUI()
         {
             if (lifeGUI != null && textGUI != null)
             {
